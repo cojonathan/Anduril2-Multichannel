@@ -1,0 +1,37 @@
+# This workflow pulls toykeepers repository on launchpad and clean up non anduril2 files.
+# Then it commits the new changes to the repository
+
+name: Update Anduril
+
+# Controls when the workflow will run
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '35 8,20 * * *' # min 35 to avoid beginning of the hour conjestion 
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  Pull-Anduril:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Clean 
+        if: ${{bzr revno > cat ${{github.workspace}}/revno 2>/dev/null}}
+        run: |
+          
+          bzr revno > ${{github.workspace}}/revno
+          rm (list of directories to remove)
+          cp -rf ${{github.workspace}}/temp/anduril2/bin/ ${{github.workspace}}/temp/anduril2/ToyKeeper/
+          rm -rf ${{github.workspace}}/temp/anduril2/bin/
+          mv -f ${{github.workspace}}/temp/anduril2/ToyKeeper/COPYING ${{github.workspace}}/LICENSE
+          export gitmessage=$(bzr log --short -l $(expr $(bzr revno) - $(cat ${{github.workspace}}/revno)))
