@@ -7,7 +7,7 @@ name: Update Anduril
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '35 8,20 * * *' # min 35 to avoid beginning of the hour conjestion 
+    - cron:  '35 8,20 * * *' # min 35 to avoid beginning of the hour congestion 
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  Pull-Anduril:
+  Update-Check:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -24,14 +24,61 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a set of commands using the runners shell
-      - name: Clean 
-        if: ${{bzr revno > cat ${{github.workspace}}/revno 2>/dev/null}}
+      - name: Pull from dependency cache  
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: bzr
+          version: 1.0
+        
+      - name: Install dependencies
+        run: sudo apt install bzr
+
+      - name: Check for update 
         run: |
-          
-          bzr revno > ${{github.workspace}}/revno
-          rm (list of directories to remove)
-          cp -rf ${{github.workspace}}/temp/anduril2/bin/ ${{github.workspace}}/temp/anduril2/ToyKeeper/
-          rm -rf ${{github.workspace}}/temp/anduril2/bin/
-          mv -f ${{github.workspace}}/temp/anduril2/ToyKeeper/COPYING ${{github.workspace}}/LICENSE
-          export gitmessage=$(bzr log --short -l $(expr $(bzr revno) - $(cat ${{github.workspace}}/revno)))
+
+
+          [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
+          [ "$revnoExists" == "true" ] && ( (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" )) && update="true" || update="false") || update=true
+
+          echo "UPDATE=$update" >> $GITHUB_ENV
+
+      - name: Get Change Info
+        if: ${{env.UPDATE == 'true'}}
+        run: |
+          [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
+          gitmessage=$([ "$revnoExists" == "true" ] && (bzr log --short -l $(( "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" - "$(cat ${{github.workspace}}/revno)" )) lp:~toykeeper/flashlight-firmware/anduril2) || bzr log --short -l 1 lp:~toykeeper/flashlight-firmware/anduril2)
+
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "GIT_MESSAGE<<$EOF" >> $GITHUB_ENV
+          echo "$gitmessage" >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
+
+      - name: Pull-Toykeeper/Anduril2
+        if: ${{env.UPDATE == 'true'}}
+        run: |
+          bzrRepositoryRoot=${{github.workspace}}/bzrTemp
+          mkdir $bzrRepositoryRoot
+          cd $bzrRepositoryRoot
+          bzr branch lp:~toykeeper/flashlight-firmware/anduril2
+          echo "BZR_REPO_ROOT=$bzrRepositoryRoot" >> $GITHUB_ENV
+
+      - name: Clean Repo
+        if: ${{env.UPDATE == 'true'}}
+        run: |
+          bzrRepositoryRoot=${{env.BZR_REPO_ROOT}}
+
+          [ -f ${{github.workspace}}/CLEANLIST ] && xargs -a ${{github.workspace}}/CLEANLIST -I{} -d'\n' rm -rf "$bzrRepositoryRoot"/anduril2/ToyKeeper/{}
+          sed -i "s/..\/..\/..\/bin\/build.sh/..\/..\/bin\/build.sh/g" "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/anduril/build-all.sh
+          sed -i "s/echo \"FAIL:\$FAILED\"/echo \"FAIL:\$FAILED\"\n  exit 1/g" "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/anduril/build-all.sh
+          mv -f "$bzrRepositoryRoot"/anduril2/bin/ "$bzrRepositoryRoot"/anduril2/ToyKeeper/
+          mv -f "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/COPYING "$bzrRepositoryRoot"/LICENSE
+          cd "$bzrRepositoryRoot"/anduril2/ToyKeeper/ || exit
+          cp -rf ./* ${{github.workspace}}
+          cd ${{github.workspace}} || exit #get out of the working directory before the rapture
+          rm -rf "$bzrRepositoryRoot"
+
+      - name: Commit Update
+        if: ${{env.UPDATE == 'true'}}
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
