@@ -47,7 +47,7 @@ jobs:
         run: |
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
           gitmessage=$([ "$revnoExists" == "true" ] && (bzr log --short -l $(( "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" - "$(cat ${{github.workspace}}/revno)" )) lp:~toykeeper/flashlight-firmware/anduril2) || bzr log --short -l 1 lp:~toykeeper/flashlight-firmware/anduril2)
-
+          bzr revno lp:~toykeeper/flashlight-firmware/anduril2 > ${{github.workspace}}/revno
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "GIT_MESSAGE<<$EOF" >> $GITHUB_ENV
           echo "$gitmessage" >> $GITHUB_ENV
@@ -81,4 +81,5 @@ jobs:
         if: ${{env.UPDATE == 'true'}}
         uses: EndBug/add-and-commit@v9
         with:
+          message: ${{env.GIT_MESSAGE}}
           default_author: github_actions
