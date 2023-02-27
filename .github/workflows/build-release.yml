@@ -1,0 +1,102 @@
+name: Build Firmware / Release
+
+on:
+  push:
+  release:
+    types: [published]
+env:
+  #the directory to store the attiny atpack
+  ATTINY_DFP: ${{github.workspace}}/atpack
+  #the version of the attiny atpack to download
+  ATPACK_VERSION: 1.10.348
+  
+jobs:
+    Build-Targets:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+    
+      #use cache for packages if one exists and this is not a release
+      - name: Checkout Package Cache
+        if: ${{ github.event_name != 'release' }}
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: wget unzip flex byacc bison gcc libusb-dev libc6-dev gcc-avr avr-libc binutils-avr
+          version: ${{env.ATPACK_VERSION}}
+        
+      - name: Install Packages
+        run:  |
+          sudo apt-get install wget unzip flex byacc bison gcc libusb-dev libc6-dev gcc-avr avr-libc binutils-avr
+        shell: bash
+      
+      #use cache for the atpack if it exists and this is not a release
+      - name: Checkout Dependency Cache
+        id: cache-dependency
+        if: ${{ github.event_name != 'release' }}
+        uses: actions/cache@v3.2.4
+        with:
+          path: ${{env.ATTINY_DFP}}
+          key:  ${{runner.os}}-atpack-${{env.ATPACK_VERSION}}
+        
+      #if there is no cache for the attiny pack then download it and extract to ATTINY_DFP
+      - name: Download Attiny Pack
+        if: steps.cache-dependency.outputs.cache-hit != 'true'
+        run: |
+          mkdir $ATTINY_DFP
+          wget -nc -q -O "$ATTINY_DFP/$ATPACK_VERSION.atpack" "http://packs.download.atmel.com/Atmel.ATtiny_DFP.$ATPACK_VERSION.atpack"
+          unzip $ATTINY_DFP/$ATPACK_VERSION.atpack -d $ATTINY_DFP
+          rm $ATTINY_DFP/$ATPACK_VERSION.atpack
+        
+      #build all firmware in build_targets.txt
+      - name: Build Target Firmware
+        run: |
+          cd ${{github.workspace}}/spaghetti-monster/anduril/
+          [ -f .buildtargets ] && xargs -a ${{github.workspace}}/.buildtargets -I{} -d'\n' ./build-all.sh "{}" || exit 1
+          
+      #if this is a release add all .hex files
+      - name: Release Built Firmware
+        if: ${{ github.event_name == 'release' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{github.workspace}}/spaghetti-monster/anduril/*.hex
+    Build-All:
+      if: ${{ github.event_name == 'release' }}
+      needs: Build-Targets
+      runs-on: ubuntu-latest
+      
+      steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Install Packages
+        run: sudo apt-get install wget unzip zip flex byacc bison gcc libusb-dev libc6-dev gcc-avr avr-libc binutils-avr
+        shell: bash
+        
+      - name: Download Attiny Pack
+        run: |
+          mkdir $ATTINY_DFP
+          wget -nc -q -O "$ATTINY_DFP/$ATPACK_VERSION.atpack" "http://packs.download.atmel.com/Atmel.ATtiny_DFP.$ATPACK_VERSION.atpack"
+          unzip $ATTINY_DFP/$ATPACK_VERSION.atpack -d $ATTINY_DFP
+          rm $ATTINY_DFP/$ATPACK_VERSION.atpack
+      
+      #build all firmware that do not fail
+      - name: Build All Firmware
+        continue-on-error: true
+        run: |
+          cd ${{github.workspace}}/spaghetti-monster/anduril/
+          ./build-all.sh
+        
+      - name: Create Untested Firmware Archive
+        run: |
+          cd ${{github.workspace}}/spaghetti-monster/anduril/
+          zip ${{github.workspace}}/UNTESTED_FW_USE_AT_OWN_RISK.zip *.hex
+          tar -cvzf ${{github.workspace}}/UNTESTED_FW_USE_AT_OWN_RISK.tar.gz *.hex
+          
+      - name: Release Untested Firmware Archive
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            UNTESTED_FW_USE_AT_OWN_RISK.zip
+            UNTESTED_FW_USE_AT_OWN_RISK.tar.gz
