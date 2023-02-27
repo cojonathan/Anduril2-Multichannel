@@ -53,7 +53,7 @@ jobs:
       - name: Build Target Firmware
         run: |
           cd ${{github.workspace}}/spaghetti-monster/anduril/
-          [ -f .buildtargets ] && xargs -a ${{github.workspace}}/.buildtargets -I{} -d'\n' ./build-all.sh "{}" || exit 1
+          [ -f ${{github.workspace}}/.buildtargets ] && xargs -a ${{github.workspace}}/.buildtargets -I{} -d'\n' ./build-all.sh "{}" || exit 1
           
       #if this is a release add all .hex files
       - name: Release Built Firmware
@@ -86,7 +86,7 @@ jobs:
         continue-on-error: true
         run: |
           cd ${{github.workspace}}/spaghetti-monster/anduril/
-          ./build-all.sh
+          ./build-all.sh 2> dev/null/
         
       - name: Create Untested Firmware Archive
         run: |
