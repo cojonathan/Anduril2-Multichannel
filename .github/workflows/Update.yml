@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      UPDATE: ${{ steps.updateCheck.outputs.UPDATE }}
+      UPDATE: ${{ steps.update-Check.outputs.UPDATE }}
       GIT_MESSAGE: ${{ steps.info.outputs.GIT_MESSAGE }}
       REVNO: ${{ steps.info.outputs.REVNO }}
 
