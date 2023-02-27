@@ -86,7 +86,7 @@ jobs:
         continue-on-error: true
         run: |
           cd ${{github.workspace}}/spaghetti-monster/anduril/
-          ./build-all.sh 2> dev/null/
+          ./build-all.sh
         
       - name: Create Untested Firmware Archive
         run: |
