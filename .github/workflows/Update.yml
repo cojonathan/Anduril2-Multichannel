@@ -40,7 +40,7 @@ jobs:
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
 
           #if the repo has a revno file compare it to the latest revision on launchpad. if the revno file is missing we need to update
-          [ "$revnoExists" == "true" ] && ( (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" )) && update="true" || update="false") || update=true
+          [ "$revnoExists" == "true" ] && ( (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" )) && export update="true" || export update="false") || export update="true"
 
           #push update variable to step outputs
           echo "UPDATE=$update" >> $GITHUB_OUTPUT
