@@ -64,6 +64,22 @@ void indicator_led_update(uint8_t mode, uint8_t tick) {
 }
 #endif
 
+#if defined(USE_BUTTON_LED) && defined(USE_AUX_RGB_LEDS) && defined(SEPARATE_BUTTON_CTRL)
+void button_led_update(uint8_t mode) {
+    //sync leds
+    if(mode == 3) {
+        button_led_separate = 0;
+        save_config();
+    }
+    else
+    {
+        button_led_separate = 1;
+        button_led_set(mode);
+        save_config();
+    }
+}
+#endif
+
 #if defined(USE_AUX_RGB_LEDS) && defined(TICK_DURING_STANDBY)
 uint8_t voltage_to_rgb() {
     static const uint8_t levels[] = {
@@ -186,7 +202,14 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
     }
     rgb_led_set(result);
     #ifdef USE_BUTTON_LED
-    button_led_set(button_led_result);
+        #ifdef SEPARATE_BUTTON_CTRL
+        if (button_led_separate == 0)
+        {
+            button_led_set(button_led_result);
+        }
+        #else
+            button_led_set(button_led_result);
+        #endif
     #endif
 }
 

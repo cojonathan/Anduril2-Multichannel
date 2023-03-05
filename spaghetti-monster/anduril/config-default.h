@@ -194,4 +194,7 @@
 // those oscillations
 //#define USE_LOWPASS_WHILE_ASLEEP
 
+#define SEPARATE_BUTTON_CTRL
+
+// If button led is used this separates the button led control from the aux led control and adds 6c to change button modes in lockout and off
 #endif

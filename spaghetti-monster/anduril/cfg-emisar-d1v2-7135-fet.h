@@ -9,6 +9,7 @@
 // some models use a simple button LED, others use RGB...
 // ... so include support for both
 #define USE_BUTTON_LED
+#undef SEPARATE_BUTTON_CTRL // disable separate button control because both aux and button leds are not present on the d1v2 at the same time
 // the aux LEDs are in the button, so use them while main LEDs are on
 // (early short run had no button LEDs at all, later run uses linear+FET instead,
 //  so it's unlikely that anyone needs this, but it doesn't hurt anything)

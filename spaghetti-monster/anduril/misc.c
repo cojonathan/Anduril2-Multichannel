@@ -62,6 +62,19 @@ void blip() {
     set_level(temp);
 }
 
+#if defined(USE_AUX_RGB_LEDS) && defined(TICK_DURING_STANDBY)
+void blink_red() {
+    rgb_led_update(RGB_RED | RGB_HIGH, 0);
+    delay_4ms(10);
+    rgb_led_update(RGB_OFF, 0);
+}
+
+void blink_green() {
+    rgb_led_update(RGB_GREEN | RGB_HIGH, 0);
+    delay_4ms(10);
+    rgb_led_update(RGB_OFF, 0);
+}
+#endif
 
 #endif
 

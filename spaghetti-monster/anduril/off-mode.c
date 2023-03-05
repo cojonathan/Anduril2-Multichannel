@@ -35,6 +35,9 @@ uint8_t off_state(Event event, uint16_t arg) {
         // redundant, sleep tick does the same thing
         //indicator_led_update(indicator_led_mode & 0x03, 0);
         #elif defined(USE_AUX_RGB_LEDS)
+                #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+                button_led_update(button_led_mode);
+                #endif
         rgb_led_update(rgb_led_off_mode, 0);
         #endif
         #ifdef USE_SUNSET_TIMER
@@ -74,6 +77,9 @@ uint8_t off_state(Event event, uint16_t arg) {
         #ifdef USE_INDICATOR_LED
         indicator_led_update(indicator_led_mode & 0x03, arg);
         #elif defined(USE_AUX_RGB_LEDS)
+            #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+            button_led_update(button_led_mode);
+            #endif
         rgb_led_update(rgb_led_off_mode, arg);
         #endif
 
@@ -271,6 +277,28 @@ uint8_t off_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif
+
+#if defined(USE_AUX_RGB_LEDS) && defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+    // 6 clicks: rotate through button LED modes (0 = off, 1 = low, 2 = high, 3 = sync)
+    else if (event == EV_6clicks)
+    {
+        uint8_t mode = button_led_mode;
+        mode = (mode + 1) % 4;
+        button_led_mode = mode;
+        if (button_led_mode == 0) {
+            blink_red();
+        }
+        else if (button_led_mode == 3) {
+            blink_green();
+        }
+
+        button_led_update(button_led_mode);
+
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+    #endif
+
     #ifdef USE_INDICATOR_LED
     // 7 clicks: change indicator LED mode
     else if (event == EV_7clicks) {

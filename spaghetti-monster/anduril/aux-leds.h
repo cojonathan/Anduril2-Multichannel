@@ -27,6 +27,22 @@ void indicator_led_update(uint8_t mode, uint8_t tick);
 uint8_t setting_rgb_mode_now = 0;
 void rgb_led_update(uint8_t mode, uint8_t arg);
 void rgb_led_voltage_readout(uint8_t bright);
+
+#define RGB_RED 0
+#define RGB_YELLOW 1
+#define RGB_GREEN 2
+#define RGB_CYAN 3
+#define RGB_BLUE 4
+#define RGB_PURPLE 5
+#define RGB_WHITE 6
+#define RGB_DISCO 7
+#define RGB_RAINBOW 8
+#define RGB_VOLTAGE 9
+#define RGB_TEMPERATURE 10
+#define RGB_OFF (0 << 4)
+#define RGB_LOW (1 << 4)
+#define RGB_HIGH (2 << 4)
+#define RGB_BLINK (3 << 4)
 /*
  * 0: R
  * 1: RG
@@ -67,6 +83,22 @@ uint8_t rgb_led_lockout_mode = RGB_LED_LOCKOUT_DEFAULT;
 
 //#define USE_OLD_BLINKING_INDICATOR
 //#define USE_FANCIER_BLINKING_INDICATOR
+#if defined(USE_BUTTON_LED) && defined(USE_AUX_RGB_LEDS) && defined(SEPARATE_BUTTON_CTRL)
+    #ifndef BUTTON_LED_DEFAULT
+    #define BUTTON_LED_DEFAULT 3 // 3 = off, 1 = low, 2 = high, 3 sync to rgb
+    #endif
+    #ifndef BUTTON_LED_LOCKOUT_DEFAULT
+    #define BUTTON_LED_LOCKOUT_DEFAULT 3 // 0 = off, 1 = low, 2 = high, 3 sync to rgb
+    #endif
+    #ifndef BUTTON_CONTROL_SEPARATE_DEFAULT
+    #define BUTTON_CONTROL_SEPARATE_DEFAULT 0 // 0 = separate off 1 = separate on
+    #endif
+    uint8_t button_led_mode = BUTTON_LED_DEFAULT;
+    uint8_t button_led_lockout_mode = BUTTON_LED_LOCKOUT_DEFAULT;
+    uint8_t button_led_separate = BUTTON_CONTROL_SEPARATE_DEFAULT;
+    void button_led_update(uint8_t mode);
+#endif
+
 #ifdef USE_INDICATOR_LED
     // bits 2-3 control lockout mode
     // bits 0-1 control "off" mode

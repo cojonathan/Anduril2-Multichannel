@@ -77,11 +77,14 @@ uint8_t lockout_state(Event event, uint16_t arg) {
         }
         return MISCHIEF_MANAGED;
     }
-    #if defined(TICK_DURING_STANDBY) && (defined(USE_INDICATOR_LED) || defined(USE_AUX_RGB_LEDS))
+#if defined(TICK_DURING_STANDBY) && (defined(USE_INDICATOR_LED) || defined(USE_AUX_RGB_LEDS))
     else if (event == EV_sleep_tick) {
         #if defined(USE_INDICATOR_LED)
         indicator_led_update(indicator_led_mode >> 2, arg);
         #elif defined(USE_AUX_RGB_LEDS)
+            #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+            button_led_update(button_led_lockout_mode);
+            #endif
         rgb_led_update(rgb_led_lockout_mode, arg);
         #endif
         return MISCHIEF_MANAGED;
@@ -135,6 +138,28 @@ uint8_t lockout_state(Event event, uint16_t arg) {
         return MISCHIEF_MANAGED;
     }
     #endif
+
+    #if defined(USE_AUX_RGB_LEDS) && defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+    // 6 clicks: rotate through button LED modes (0 = off, 1 = low, 2 = high, 3 = sync) (lockout mode)
+    else if (event == EV_6clicks)
+    {
+        uint8_t mode = button_led_lockout_mode;
+        mode = (mode + 1) % 4;
+        button_led_lockout_mode = mode;
+
+        if (button_led_lockout_mode == 0) {
+            blink_red();
+        }
+        else if (button_led_lockout_mode == 3) {
+            blink_green();
+        }
+
+        button_led_update(button_led_lockout_mode);
+
+        save_config();
+        return MISCHIEF_MANAGED;
+    }
+#endif
 
     #if defined(USE_INDICATOR_LED)
     // 7 clicks: rotate through indicator LED modes (lockout mode)
