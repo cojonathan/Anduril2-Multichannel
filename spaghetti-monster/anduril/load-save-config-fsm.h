@@ -50,7 +50,7 @@ typedef enum {
     ramp_2c_style_e,
     #endif
     #ifdef USE_MANUAL_MEMORY
-        manual_memory_e,
+            manual_memory_e,
         #ifdef USE_MANUAL_MEMORY_TIMER
             manual_memory_timer_e,
         #endif
@@ -63,7 +63,7 @@ typedef enum {
         tint_style_e,
     #endif
     #ifdef USE_JUMP_START
-        jump_start_level_e,
+    jump_start_level_e,
     #endif
     #ifdef USE_STROBE_STATE
     strobe_type_e,
@@ -87,6 +87,11 @@ typedef enum {
     #endif
     #ifdef USE_INDICATOR_LED
     indicator_led_mode_e,
+    #endif
+    #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+        button_led_mode_e,
+        button_led_lockout_mode_e,
+        button_led_separate_e,
     #endif
     #ifdef USE_AUX_RGB_LEDS
     rgb_led_off_mode_e,

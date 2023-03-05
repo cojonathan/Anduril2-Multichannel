@@ -88,6 +88,11 @@ void load_config() {
         #ifdef USE_INDICATOR_LED
         indicator_led_mode = eeprom[indicator_led_mode_e];
         #endif
+        #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+        button_led_mode = eeprom[button_led_mode_e];
+        button_led_lockout_mode = eeprom[rgb_led_lockout_mode_e];
+        button_led_separate = eeprom[button_led_separate_e];
+        #endif
         #ifdef USE_AUX_RGB_LEDS
         rgb_led_off_mode = eeprom[rgb_led_off_mode_e];
         rgb_led_lockout_mode = eeprom[rgb_led_lockout_mode_e];
@@ -166,6 +171,11 @@ void save_config() {
     #endif
     #ifdef USE_INDICATOR_LED
     eeprom[indicator_led_mode_e] = indicator_led_mode;
+    #endif
+    #if defined(USE_BUTTON_LED) && defined(SEPARATE_BUTTON_CTRL)
+    eeprom[button_led_mode_e] = button_led_mode;
+    eeprom[button_led_lockout_mode_e] = button_led_lockout_mode;
+    eeprom[button_led_separate_e] = button_led_separate;
     #endif
     #ifdef USE_AUX_RGB_LEDS
     eeprom[rgb_led_off_mode_e] = rgb_led_off_mode;
