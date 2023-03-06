@@ -38,7 +38,6 @@ void rgb_led_voltage_readout(uint8_t bright);
 #define RGB_DISCO 7
 #define RGB_RAINBOW 8
 #define RGB_VOLTAGE 9
-#define RGB_TEMPERATURE 10
 #define RGB_OFF (0 << 4)
 #define RGB_LOW (1 << 4)
 #define RGB_HIGH (2 << 4)

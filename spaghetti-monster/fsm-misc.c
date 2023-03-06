@@ -20,6 +20,9 @@
 #ifndef FSM_MISC_C
 #define FSM_MISC_C
 
+#if defined(USE_AUX_RGB_LEDS) || defined(USE_INDICATOR_LED)
+#include "spaghetti-monster/anduril/aux-leds.h"
+#endif
 
 #ifdef USE_DYNAMIC_UNDERCLOCKING
 void auto_clock_speed() {
@@ -50,9 +53,21 @@ uint8_t blink_digit(uint8_t num) {
     if (!num) { ontime = 8; num ++; }
 
     for (; num>0; num--) {
+        #if defined(USE_AUX_RGB_LEDS)
+        rgb_led_update(RGB_RED | RGB_HIGH, 0);
+        #elif defined(USE_INDICATOR_LED)
+        indicator_led(2);
+        #else
         set_level(BLINK_BRIGHTNESS);
+        #endif
         nice_delay_ms(ontime);
+        #if defined(USE_AUX_RGB_LEDS)
+        rgb_led_update(RGB_OFF, 0);
+        #elif defined(USE_INDICATOR_LED)
+        indicator_led(0);
+        #else
         set_level(0);
+#endif
         nice_delay_ms(BLINK_SPEED * 3 / 12);
     }
     return nice_delay_ms(BLINK_SPEED * 8 / 12);

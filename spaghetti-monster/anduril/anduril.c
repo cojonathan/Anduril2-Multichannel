@@ -213,8 +213,23 @@ void setup() {
 
         // regular e-switch light, no hard clicky power button
 
-        // blink at power-on to let user know power is connected
-        blink_once();
+        // rainbow blink at power on :)
+        #if defined(USE_AUX_RGB_LEDS)
+        rgb_led_update(RGB_RED | RGB_HIGH, 0);
+        delay_4ms(50);
+        rgb_led_update(RGB_GREEN | RGB_HIGH, 0);
+        delay_4ms(50);
+        rgb_led_update(RGB_BLUE | RGB_HIGH, 0);
+        delay_4ms(50);
+        rgb_led_update(RGB_OFF, 0);
+        #elif defined(USE_INDICATOR_LED)
+            indicator_led(2);
+            delay_4ms(10);
+            indicator_led(0);
+        #else
+        // or just blink main emitter if we have no AUX LED
+            blink_once();
+        #endif
 
         #ifdef USE_FACTORY_RESET
         if (button_is_pressed())
