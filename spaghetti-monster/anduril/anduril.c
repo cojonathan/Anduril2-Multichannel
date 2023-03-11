@@ -282,7 +282,47 @@ void loop() {
 
     #ifdef USE_AUX_RGB_LEDS_WHILE_ON
     // display battery charge on RGB button during use
-    if (! setting_rgb_mode_now) rgb_led_voltage_readout(1);
+    if (!setting_rgb_mode_now )
+    {
+            switch (rgb_while_on_mode)
+            {
+            case 0: 
+            {   //dont turn on aux leds
+                rgb_led_update(RGB_OFF, 0);
+                break;
+            }
+            case 1:
+            {
+                // match solid colors to brightness.  Blink stays solid while on.
+                // voltage display if in color shifting mode. voltage works the same as mode 2
+                uint8_t rgb_mode = rgb_led_off_mode;
+                uint8_t color = rgb_mode & 0x0f;
+                uint8_t mode = rgb_mode >> 4;
+                if (mode == RGB_OFF >> 4) {
+                    rgb_led_update(RGB_OFF, 0);
+                }
+                else if (color < RGB_DISCO) {
+                    if (actual_level > DEFAULT_LEVEL) {
+                        rgb_mode = (RGB_HIGH | color);
+                    }
+                    else if (actual_level > 0) {
+                        rgb_mode = (RGB_LOW | color);
+                    }
+                    rgb_led_update(rgb_mode, 0);
+                }
+                else {
+                    rgb_led_voltage_readout(actual_level > DEFAULT_LEVEL);
+                }
+                break;
+            }
+            default:
+            {
+                //voltage mode. brightness matches output. DEFAULT
+                rgb_led_voltage_readout(actual_level > DEFAULT_LEVEL);
+                break;
+            }
+        }
+    }
     #endif
 
     if (0) {}  // placeholder

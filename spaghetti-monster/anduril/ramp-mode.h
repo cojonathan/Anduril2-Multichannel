@@ -224,16 +224,27 @@ uint8_t ramp_stepss[] = {
     };
 uint8_t ramp_discrete_step_size;  // don't set this
 
+#ifdef USE_AUX_RGB_LEDS_WHILE_ON
+#ifndef RGB_WHILE_ON_MODE_DEFAULT
+#define RGB_WHILE_ON_MODE_DEFAULT 2
+#endif
+// off = 0, solid colors behave like button led while on =  1, show voltage color while on = 2
+uint8_t rgb_while_on_mode = RGB_WHILE_ON_MODE_DEFAULT; 
+#endif
+
 #ifdef USE_GLOBALS_CONFIG
-typedef enum {
+    typedef enum {
     #ifdef USE_TINT_RAMPING
-    tint_style_config_step,
+      tint_style_config_step,
     #endif
     #ifdef USE_JUMP_START
-    jump_start_config_step,
+      jump_start_config_step,
     #endif
-    globals_config_num_steps
-} globals_config_steps_e;
+    #ifdef USE_AUX_RGB_LEDS_WHILE_ON
+      rgb_while_on_config_step,
+    #endif
+      globals_config_num_steps
+    } globals_config_steps_e;
 
 void globals_config_save(uint8_t step, uint8_t value);
 uint8_t globals_config_state(Event event, uint16_t arg);

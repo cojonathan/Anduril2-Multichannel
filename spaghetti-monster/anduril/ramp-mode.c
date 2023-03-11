@@ -574,6 +574,11 @@ void globals_config_save(uint8_t step, uint8_t value) {
     #ifdef USE_JUMP_START
     else if (step == 1+jump_start_config_step) { jump_start_level = value; }
     #endif
+    #ifdef USE_AUX_RGB_LEDS_WHILE_ON
+    else if (step == 1 + rgb_while_on_config_step) {
+        rgb_while_on_mode = value > 2 ? 2 : value; // any value over 2 defaults to 2
+    }
+    #endif
 }
 
 uint8_t globals_config_state(Event event, uint16_t arg) {

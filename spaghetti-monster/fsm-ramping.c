@@ -62,10 +62,13 @@ void set_level(uint8_t level) {
                 indicator_led(0);
             #endif
             #ifdef USE_AUX_RGB_LEDS
+                #ifndef USE_AUX_RGB_LEDS_WHILE_ON
                 rgb_led_set(0);
+                #endif
                 #ifdef USE_BUTTON_LED
                     button_led_set((level > 0) + (level > DEFAULT_LEVEL));
                 #endif
+
             #endif
         }
         #endif
