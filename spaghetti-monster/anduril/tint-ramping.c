@@ -97,6 +97,23 @@ uint8_t tint_ramping_state(Event event, uint16_t arg) {
         return EVENT_HANDLED;
     }
 
+    // 4H to go to middle tint
+    else if (event == EV_click4_hold)
+    {
+        tint = 127;
+        set_level(actual_level);
+        return EVENT_HANDLED;
+    }
+
+    // 5C to go to tint edge
+    else if (event == EV_5clicks && tint_style == 0) // only use with tint ramp not instant switching
+    {
+        tint = (tint == 1) ? 254 : 1;
+        tint_ramp_direction = (tint == 1) ? 1 : -1;
+        set_level(actual_level);
+        return EVENT_HANDLED;
+    }
+
     return EVENT_NOT_HANDLED;
 }
 
