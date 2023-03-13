@@ -43,6 +43,7 @@ Model	Name                          	MCU
 0314	fw3x-lume1                    	attiny1634
 0321	blf-gt                        	attiny85
 0322	blf-gt-mini                   	attiny85
+0323    lumintop-frog                   attiny85
 0411	ff-rot66                      	attiny85
 0412	ff-rot66-219                  	attiny85
 0413	ff-rot66g2                    	attiny85
