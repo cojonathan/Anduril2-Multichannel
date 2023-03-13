@@ -47,7 +47,7 @@
 #endif
 
 // include an extra config mode for random stuff which doesn't fit elsewhere
-#if defined(USE_TINT_RAMPING) || defined(USE_JUMP_START) || defined(USE_AUX_RGB_LEDS_WHILE_ON)
+#if defined(USE_TINT_RAMPING) || defined(USE_JUMP_START) || defined(USE_AUX_RGB_LEDS_WHILE_ON) || defined(USE_RAMP_START_MODE)
 #define USE_GLOBALS_CONFIG
 #endif
 

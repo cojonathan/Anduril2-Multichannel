@@ -157,6 +157,9 @@ void save_config() {
     #ifdef USE_AUX_RGB_LEDS_WHILE_ON
     eeprom[rgb_while_on_mode_e] = rgb_while_on_mode;
     #endif
+    #ifdef USE_RAMP_START_MODE
+        ramp_start_mode = eeprom[ramp_start_mode_e];
+    #endif
     #if defined(USE_PARTY_STROBE_MODE) || defined(USE_TACTICAL_STROBE_MODE)
     eeprom[strobe_type_e] = strobe_type;  // TODO: move this to eeprom_wl?
     eeprom[strobe_delays_0_e] = strobe_delays[0];

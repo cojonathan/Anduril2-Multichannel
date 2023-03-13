@@ -197,4 +197,10 @@
 #define SEPARATE_BUTTON_CTRL
 
 // If button led is used this separates the button led control from the aux led control and adds 6c to change button modes in lockout and off
+
+#define USE_RAMP_START_MODE
+// Enables the ramped startup mode option 
+//  0: instant on (default)
+//  1: ramp smoothly till on
+
 #endif
