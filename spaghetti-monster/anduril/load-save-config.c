@@ -70,6 +70,9 @@ void load_config() {
         #ifdef USE_AUX_RGB_LEDS_WHILE_ON
             rgb_while_on_mode = eeprom[rgb_while_on_mode_e];
         #endif
+        #ifdef USE_RAMP_START_MODE
+        ramp_start_mode = eeprom[ramp_start_mode_e];
+        #endif
         #if defined(USE_PARTY_STROBE_MODE) || defined(USE_TACTICAL_STROBE_MODE)
         strobe_type = eeprom[strobe_type_e];  // TODO: move this to eeprom_wl?
         strobe_delays[0] = eeprom[strobe_delays_0_e];
@@ -148,17 +151,17 @@ void save_config() {
         #endif
     #endif
     #ifdef USE_TINT_RAMPING
-        eeprom[tint_e] = tint;
-        eeprom[tint_style_e] = tint_style;
+    eeprom[tint_e] = tint;
+    eeprom[tint_style_e] = tint_style;
     #endif
     #ifdef USE_JUMP_START
-        eeprom[jump_start_level_e] = jump_start_level,
+    eeprom[jump_start_level_e] = jump_start_level,
     #endif
     #ifdef USE_AUX_RGB_LEDS_WHILE_ON
     eeprom[rgb_while_on_mode_e] = rgb_while_on_mode;
     #endif
     #ifdef USE_RAMP_START_MODE
-        ramp_start_mode = eeprom[ramp_start_mode_e];
+    eeprom[ramp_start_mode_e] = ramp_start_mode;
     #endif
     #if defined(USE_PARTY_STROBE_MODE) || defined(USE_TACTICAL_STROBE_MODE)
     eeprom[strobe_type_e] = strobe_type;  // TODO: move this to eeprom_wl?

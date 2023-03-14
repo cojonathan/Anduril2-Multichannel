@@ -56,6 +56,8 @@
 #define SIMPLE_UI_CEIL RAMP_DISCRETE_CEIL
 #define SIMPLE_UI_STEPS 5
 
+#define SIMPLE_UI_ACTIVE 0
+
 // stop panicking at ~1500 lm
 #define THERM_FASTER_LEVEL 130
 #define MIN_THERM_STEPDOWN 65  // should be above highest dyn_pwm level

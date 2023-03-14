@@ -244,7 +244,7 @@ uint8_t rgb_while_on_mode = RGB_WHILE_ON_MODE_DEFAULT;
       rgb_while_on_config_step,
     #endif
     #ifdef USE_RAMP_START_MODE
-    ramp_start_mode_config_step,
+      ramp_start_mode_config_step,
     #endif
       globals_config_num_steps
     } globals_config_steps_e;
