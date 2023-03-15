@@ -3,3 +3,7 @@ cfg-noctigon-kr4-nofet.h
 cfg-noctigon-kr4.h
 cfg-emisar-d4sv2-tintramp.h
 cfg-sofirn-sp10-pro.h
+cfg-emisar-d1v2-nofet.h
+cfg-wurkkos-ts10.h
+cfg-wurkkos-ts25.h
+cfg-lumintop-frog-v1.h
