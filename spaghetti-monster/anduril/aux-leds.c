@@ -27,6 +27,7 @@
 void indicator_led_update(uint8_t mode, uint8_t tick) {
     //uint8_t volts = voltage;  // save a few bytes by caching volatile value
     // turn off when battery is too low
+
     if (voltage < VOLTAGE_LOW) {
         indicator_led(0);
     }
@@ -129,7 +130,8 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
 
     const uint8_t *colors = rgb_led_colors;
     uint8_t actual_color = 0;
-    if (color < 7) {  // normal color
+    if(0){}
+    else if (color < 7) {  // normal color
         #ifdef USE_K93_LOCKOUT_KLUDGE
         // FIXME: jank alert: this is dumb
         // this clause does nothing; it just uses up clock cycles
