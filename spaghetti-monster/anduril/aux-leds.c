@@ -30,11 +30,22 @@ void indicator_led_update(uint8_t mode, uint8_t tick) {
 
     if (voltage < VOLTAGE_LOW) {
         indicator_led(0);
+        warning_blinking = 0;
+    }
+    else if (LV_warning_snooze && voltage >= (VOLTAGE_RED + 5))
+    {
+        LV_warning_snooze = 0;
     }
     //#ifdef USE_INDICATOR_LOW_BAT_WARNING
     // fast blink a warning when battery is low but not critical
-    else if (voltage < VOLTAGE_RED) {
+    else if (voltage < VOLTAGE_RED && !LV_warning_snooze)
+    {
         indicator_led(mode & (((tick & 0b0010)>>1) - 3));
+        warning_blinking = 1;
+    }
+    else if (warning_blinking){
+        warning_blinking = 0;
+        indicator_led_update(mode, tick);
     }
     //#endif
     // normal steady output, 0/1/2 = off / low / high
@@ -68,7 +79,17 @@ void indicator_led_update(uint8_t mode, uint8_t tick) {
 #if defined(USE_BUTTON_LED) && defined(USE_AUX_RGB_LEDS) && defined(SEPARATE_BUTTON_CTRL)
 void button_led_update(uint8_t mode) {
     //sync leds
-    if(mode == 3) {
+
+    if(0){}
+    else if (voltage < VOLTAGE_LOW)
+    {
+        button_led_set(0);
+    }
+    else if (voltage < VOLTAGE_RED && !LV_warning_snooze)
+    {
+        return;
+    }
+    else if(mode == 3) {
         button_led_separate = 0;
         save_config();
     }
@@ -118,6 +139,7 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
         #ifdef USE_BUTTON_LED
         button_led_set(0);
         #endif
+        warning_blinking = 0;
         return;
     }
 
@@ -131,6 +153,34 @@ void rgb_led_update(uint8_t mode, uint8_t arg) {
     const uint8_t *colors = rgb_led_colors;
     uint8_t actual_color = 0;
     if(0){}
+    else if (LV_warning_snooze && volts >= (VOLTAGE_RED + 5))
+    {
+        LV_warning_snooze = 0;
+    }
+    else if (volts < VOLTAGE_RED && !LV_warning_snooze && color != RGB_VOLTAGE) // dont need warning if user is already using rgb voltage
+    {
+        if ((arg & 0b0010) >> 1)
+        {
+            rgb_led_set(2);
+            #ifdef USE_BUTTON_LED
+            button_led_set(2);
+            #endif
+            return;
+        }
+        else
+        {
+            rgb_led_set(0);
+            #ifdef USE_BUTTON_LED
+            button_led_set(0);
+            #endif
+            return;
+        }
+        warning_blinking = 1;
+    }
+    else if (warning_blinking){ //clear warning status and rerun update
+        warning_blinking = 0;
+        rgb_led_update(mode, arg);
+    }
     else if (color < 7) {  // normal color
         #ifdef USE_K93_LOCKOUT_KLUDGE
         // FIXME: jank alert: this is dumb

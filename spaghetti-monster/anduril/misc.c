@@ -64,15 +64,26 @@ void blip() {
 
 #if defined(USE_AUX_RGB_LEDS) && defined(TICK_DURING_STANDBY)
 void blink_red() {
-    rgb_led_update(RGB_RED | RGB_HIGH, 0);
+    rgb_led_set(2);
+    #ifdef USE_BUTTON_LED
+    button_led_set(2);
+    #endif
     delay_4ms(10);
-    rgb_led_update(RGB_OFF, 0);
+    #ifdef USE_BUTTON_LED
+    button_led_set(0);
+    #endif
 }
 
 void blink_green() {
-    rgb_led_update(RGB_GREEN | RGB_HIGH, 0);
+    rgb_led_set(8);
+    #ifdef USE_BUTTON_LED
+    button_led_set(2);
+    #endif
     delay_4ms(10);
-    rgb_led_update(RGB_OFF, 0);
+    rgb_led_set(0);
+    #ifdef USE_BUTTON_LED
+    button_led_set(0);
+    #endif
 }
 #endif
 

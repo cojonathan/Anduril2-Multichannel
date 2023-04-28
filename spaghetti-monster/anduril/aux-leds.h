@@ -114,5 +114,8 @@ uint8_t rgb_led_lockout_mode = RGB_LED_LOCKOUT_DEFAULT;
     #endif
 #endif
 
-
+#if defined(USE_INDICATOR_LED) || defined(USE_AUX_RGB_LEDS)
+uint8_t LV_warning_snooze = 0;
+uint8_t warning_blinking = 0;
+#endif
 #endif

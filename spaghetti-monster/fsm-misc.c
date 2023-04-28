@@ -54,7 +54,10 @@ uint8_t blink_digit(uint8_t num) {
 
     for (; num>0; num--) {
         #if defined(USE_AUX_RGB_LEDS)
-        rgb_led_update(RGB_RED | RGB_HIGH, 0);
+        rgb_led_set(0x02); //red on high
+        #ifdef USE_BUTTON_LED
+        button_led_set(2);
+        #endif
         #elif defined(USE_INDICATOR_LED)
         indicator_led(2);
         #else
@@ -62,12 +65,15 @@ uint8_t blink_digit(uint8_t num) {
         #endif
         nice_delay_ms(ontime);
         #if defined(USE_AUX_RGB_LEDS)
-        rgb_led_update(RGB_OFF, 0);
+        rgb_led_set(0);
+        #ifdef USE_BUTTON_LED
+        button_led_set(0);//off
+        #endif
         #elif defined(USE_INDICATOR_LED)
         indicator_led(0);
         #else
         set_level(0);
-#endif
+        #endif
         nice_delay_ms(BLINK_SPEED * 3 / 12);
     }
     return nice_delay_ms(BLINK_SPEED * 8 / 12);

@@ -175,6 +175,13 @@ uint8_t off_state(Event event, uint16_t arg) {
     }
     // click, hold: momentary at ceiling or turbo
     else if (event == EV_click2_hold) {
+        #if defined(USE_INDICATOR_LED) || defined(USE_AUX_RGB_LEDS)
+        if (warning_blinking) {
+        LV_warning_snooze = 1;
+        warning_blinking = 0;
+        return MISCHIEF_MANAGED;
+        } 
+        #endif
         uint8_t turbo_level;  // how bright is "turbo"?
 
         #if defined(USE_2C_STYLE_CONFIG)  // user can choose 2C behavior

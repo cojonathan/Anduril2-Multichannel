@@ -218,13 +218,13 @@ void setup() {
 
         // rainbow blink at power on :)
         #if defined(USE_AUX_RGB_LEDS)
-        rgb_led_update(RGB_RED | RGB_HIGH, 0);
-        delay_4ms(50);
-        rgb_led_update(RGB_GREEN | RGB_HIGH, 0);
-        delay_4ms(50);
-        rgb_led_update(RGB_BLUE | RGB_HIGH, 0);
-        delay_4ms(50);
-        rgb_led_update(RGB_OFF, 0);
+            rgb_led_set(2);//red
+            delay_4ms(50);
+            rgb_led_set(8);//green
+            delay_4ms(50);
+            rgb_led_set(0x20);//blue
+            delay_4ms(50);
+            rgb_led_update(RGB_OFF, 0);
         #elif defined(USE_INDICATOR_LED)
             indicator_led(2);
             delay_4ms(10);
