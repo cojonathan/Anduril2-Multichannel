@@ -114,19 +114,10 @@ jobs:
           message: ${{ steps.info.outputs.GIT_MESSAGE }}
           default_author: github_actions
 
-
 #create release so the build action is triggered
-  release:
-    if: ${{needs.Update-Check.outputs.UPDATE == 'true'}}
-    needs: Update-Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-
-      - name: Create Release
+      - name: release
         id: create_release
+        if: ${{needs.Update-Check.outputs.UPDATE == 'true'}}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }} #workaround so it triggers the other workflow :|
