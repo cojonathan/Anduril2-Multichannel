@@ -10,9 +10,6 @@ on:
   # Allows manual trigger from the Actions tab
   workflow_dispatch:
 
-env:
-  UPDATE_REPO_BRANCH: lp:~toykeeper/flashlight-firmware/multi-channel
-  
 jobs:
   Update-Check:
     runs-on: ubuntu-latest
@@ -43,7 +40,7 @@ jobs:
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
 
           #if the repo has a revno file compare it to the latest revision on launchpad. if the revno file is missing we need to update
-          update=$(if [ "$revnoExists" == "true" ]; then if (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno ${{env.UPDATE_REPO_BRANCH}})" )); then echo "true"; else echo "false"; fi; else echo "true"; fi)
+          update=$(if [ "$revnoExists" == "true" ]; then if (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" )); then echo "true"; else echo "false"; fi; else echo "true"; fi)
 
           #push update variable to step outputs
           echo "UPDATE=$update" >> $GITHUB_OUTPUT
@@ -55,10 +52,10 @@ jobs:
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
 
           #if the revno file exists calculate how many revisions are missing and pull all the change logs. if file is missing just get the latest change log
-          gitmessage=$([ "$revnoExists" == "true" ] && bzr log --short -l $(( "$(bzr revno ${{env.UPDATE_REPO_BRANCH}})" - "$(cat ${{github.workspace}}/revno)" )) ${{env.UPDATE_REPO_BRANCH}} || bzr log --short -l 1 ${{env.UPDATE_REPO_BRANCH}})
+          gitmessage=$([ "$revnoExists" == "true" ] && bzr log --short -l $(( "$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" - "$(cat ${{github.workspace}}/revno)" )) lp:~toykeeper/flashlight-firmware/anduril2 || bzr log --short -l 1 lp:~toykeeper/flashlight-firmware/anduril2)
 
           #write the newest revno to the revno file
-          bzr revno ${{env.UPDATE_REPO_BRANCH}} > ${{github.workspace}}/revno
+          bzr revno lp:~toykeeper/flashlight-firmware/anduril2 > ${{github.workspace}}/revno
 
           #create a random delimiter and send the multiline log messages to git outputs ending with the delimiter
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
@@ -67,7 +64,7 @@ jobs:
           echo "$EOF" >> $GITHUB_OUTPUT
 
           #send the revno to git env for later use
-          echo "REVNO=$(bzr revno ${{env.UPDATE_REPO_BRANCH}}" >> $GITHUB_OUTPUT
+          echo "REVNO=$(bzr revno lp:~toykeeper/flashlight-firmware/anduril2)" >> $GITHUB_OUTPUT
 
       - name: Pull-Toykeeper/Anduril2
         id: pull
@@ -77,8 +74,8 @@ jobs:
           mkdir "$bzrRepositoryRoot"
           cd "$bzrRepositoryRoot" || exit
 
-          #pull the branch from launchpad
-          bzr branch ${{env.UPDATE_REPO_BRANCH}}
+          #pull the toykeeper/anduril2 branch from launchpad
+          bzr branch lp:~toykeeper/flashlight-firmware/anduril2
 
           #send bzr repo location to git env for later use
           echo "BZR_REPO_ROOT=$bzrRepositoryRoot" >> $GITHUB_ENV
