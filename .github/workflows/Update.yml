@@ -120,7 +120,7 @@ jobs:
 #create release so the build action is triggered
       - name: release
         id: create_release
-        if: ${{needs.Update-Check.outputs.UPDATE == 'true'}}
+        if: ${{steps.update-check.outputs.UPDATE == 'true'}}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }} #workaround so it triggers the other workflow :|
