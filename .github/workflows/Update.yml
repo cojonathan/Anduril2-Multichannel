@@ -19,6 +19,9 @@ jobs:
       GIT_MESSAGE: ${{ steps.info.outputs.GIT_MESSAGE }}
       REVNO: ${{ steps.info.outputs.REVNO }}
 
+    env:
+      REPO_URL: lp:~toykeeper/flashlight-firmware/multi-channel
+      BRANCH_NAME: multi-channel 
 
     steps:
       - name: Checkout Repo
@@ -40,7 +43,7 @@ jobs:
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
 
           #if the repo has a revno file compare it to the latest revision on launchpad. if the revno file is missing we need to update
-          update=$(if [ "$revnoExists" == "true" ]; then if (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno lp:~toykeeper/flashlight-firmware/multi-channel)" )); then echo "true"; else echo "false"; fi; else echo "true"; fi)
+          update=$(if [ "$revnoExists" == "true" ]; then if (( "$(cat ${{github.workspace}}/revno)" < "$(bzr revno ${{env.REPO_URL}})" )); then echo "true"; else echo "false"; fi; else echo "true"; fi)
 
           #push update variable to step outputs
           echo "UPDATE=$update" >> $GITHUB_OUTPUT
@@ -52,10 +55,10 @@ jobs:
           [ -f ${{github.workspace}}/revno ]  && revnoExists="true" || revnoExists="false"
 
           #if the revno file exists calculate how many revisions are missing and pull all the change logs. if file is missing just get the latest change log
-          gitmessage=$([ "$revnoExists" == "true" ] && bzr log --short -l $(( "$(bzr revno lp:~toykeeper/flashlight-firmware/multi-channel)" - "$(cat ${{github.workspace}}/revno)" )) lp:~toykeeper/flashlight-firmware/multi-channel || bzr log --short -l 1 lp:~toykeeper/flashlight-firmware/multi-channel)
+          gitmessage=$([ "$revnoExists" == "true" ] && bzr log --short -l $(( "$(bzr revno ${{env.REPO_URL}})" - "$(cat ${{github.workspace}}/revno)" )) ${{env.REPO_URL}} || bzr log --short -l 1 ${{env.REPO_URL}})
 
           #write the newest revno to the revno file
-          bzr revno lp:~toykeeper/flashlight-firmware/multi-channel > ${{github.workspace}}/revno
+          bzr revno ${{env.REPO_URL}} > ${{github.workspace}}/revno
 
           #create a random delimiter and send the multiline log messages to git outputs ending with the delimiter
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
@@ -64,7 +67,7 @@ jobs:
           echo "$EOF" >> $GITHUB_OUTPUT
 
           #send the revno to git env for later use
-          echo "REVNO=$(bzr revno lp:~toykeeper/flashlight-firmware/multi-channel)" >> $GITHUB_OUTPUT
+          echo "REVNO=$(bzr revno ${{env.REPO_URL}})" >> $GITHUB_OUTPUT
 
       - name: Pull-Toykeeper/Anduril2
         id: pull
@@ -75,7 +78,7 @@ jobs:
           cd "$bzrRepositoryRoot" || exit
 
           #pull the toykeeper/anduril2 branch from launchpad
-          bzr branch lp:~toykeeper/flashlight-firmware/multi-channel
+          bzr branch ${{env.REPO_URL}}
 
           #send bzr repo location to git env for later use
           echo "BZR_REPO_ROOT=$bzrRepositoryRoot" >> $GITHUB_ENV
@@ -86,23 +89,23 @@ jobs:
         run: |
           bzrRepositoryRoot=${{env.BZR_REPO_ROOT}}
 
-          #remove directories and files listed in the CLEANLIST. all items in CLEANLIST are prepended with "$bzrRepositoryRoot"/anduril2/ToyKeeper/
-          [ -f ${{github.workspace}}/CLEANLIST ] && xargs -a ${{github.workspace}}/CLEANLIST -I{} -d'\n' rm -rf "$bzrRepositoryRoot"/anduril2/ToyKeeper/{}
+          #remove directories and files listed in the CLEANLIST. all items in CLEANLIST are prepended with "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/
+          [ -f ${{github.workspace}}/CLEANLIST ] && xargs -a ${{github.workspace}}/CLEANLIST -I{} -d'\n' rm -rf "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/{}
 
           #update ./build-all.sh with the new bin folder location
-          sed -i "s/..\/..\/..\/bin\/build.sh/..\/..\/bin\/build.sh/g" "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/anduril/build-all.sh
+          sed -i "s/..\/..\/..\/bin\/build.sh/..\/..\/bin\/build.sh/g" "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/spaghetti-monster/anduril/build-all.sh
 
           #add exit status if builds fail in build-all So the build workflow will function
-          sed -i "s/echo \"FAIL:\$FAILED\"/echo \"FAIL:\$FAILED\"\n  exit 1/g" "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/anduril/build-all.sh
+          sed -i "s/echo \"FAIL:\$FAILED\"/echo \"FAIL:\$FAILED\"\n  exit 1/g" "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/spaghetti-monster/anduril/build-all.sh
 
           #move bin folder into ToyKeeper
-          mv -f "$bzrRepositoryRoot"/anduril2/bin/ "$bzrRepositoryRoot"/anduril2/ToyKeeper/
+          mv -f "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/bin/ "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/
 
           #move license into ToyKeeper
-          mv -f "$bzrRepositoryRoot"/anduril2/ToyKeeper/spaghetti-monster/COPYING "$bzrRepositoryRoot"/anduril2/ToyKeeper/LICENSE
+          mv -f "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/spaghetti-monster/COPYING "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/LICENSE
 
           #copy cleaned up bzr repo to git repo root and delete temp files
-          cd "$bzrRepositoryRoot"/anduril2/ToyKeeper/ || exit
+          cd "$bzrRepositoryRoot"/${{env.BRANCH_NAME}}/ToyKeeper/ || exit
           cp -rf ./* ${{github.workspace}}
           cd ${{github.workspace}} || exit #get out of the working directory before the rapture
           rm -rf "$bzrRepositoryRoot"
