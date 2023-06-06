@@ -1,4 +1,8 @@
 // Noctigon K9.3 config options for Anduril
+// Copyright (C) 2020-2023 Selene ToyKeeper
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
 #define MODEL_NUMBER "0261"
 #include "hwdef-Noctigon_K9.3.h"
 #include "hank-cfg.h"
@@ -80,6 +84,3 @@ inline void set_level_override(uint8_t level);
 // for consistency with KR4 (not otherwise necessary though)
 #define USE_SOFT_FACTORY_RESET
 
-
-// work around bizarre bug: lockout mode fails when set to solid color blinking
-#define USE_K93_LOCKOUT_KLUDGE

@@ -1,7 +1,11 @@
 // Emisar D1v2 (7135+FET) config options for Anduril
-// (was only made for a short time, not many people have one)
+// Copyright (C) 2020-2023 Selene ToyKeeper
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
 // ATTINY: 1634
 // same as Emisar D4v2, mostly
+// (was only made for a short time, not many people have one)
 #include "cfg-emisar-d4v2.h"
 #undef MODEL_NUMBER
 #define MODEL_NUMBER "0123"
@@ -26,6 +30,3 @@
 #endif
 #define THERM_FASTER_LEVEL (RAMP_SIZE*9/10)  // throttle back faster when high
 
-
-// work around bizarre bug: lockout mode fails when set to solid color blinking
-#define USE_K93_LOCKOUT_KLUDGE

@@ -1,24 +1,8 @@
-/*
- * strobe-modes.h: Strobe modes for Anduril.
- *
- * Copyright (C) 2017 Selene Scriven
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// strobe-modes.h: Strobe modes for Anduril.
+// Copyright (C) 2017-2023 Selene ToyKeeper
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef STROBE_MODES_H
-#define STROBE_MODES_H
+#pragma once
 
 // internal numbering for strobe modes
 #ifdef USE_STROBE_STATE
@@ -28,6 +12,9 @@ typedef enum {
     #endif
     #ifdef USE_TACTICAL_STROBE_MODE
     tactical_strobe_e,
+    #endif
+    #ifdef USE_POLICE_COLOR_STROBE_MODE
+    police_color_strobe_e,
     #endif
     #ifdef USE_LIGHTNING_MODE
     lightning_storm_e,
@@ -45,9 +32,9 @@ const int NUM_STROBES = strobe_mode_END;
 
 // which strobe mode is active?
 #ifdef USE_CANDLE_MODE
-strobe_mode_te strobe_type = candle_mode_e;
+    #define DEFAULT_STROBE candle_mode_e
 #else
-strobe_mode_te strobe_type = 0;
+    #define DEFAULT_STROBE 0
 #endif
 #endif
 
@@ -76,9 +63,11 @@ inline void strobe_state_iter();
 #endif
 
 #if defined(USE_PARTY_STROBE_MODE) || defined(USE_TACTICAL_STROBE_MODE)
-// party / tactical strobe timing
-uint8_t strobe_delays[] = { 41, 67 };  // party strobe 24 Hz, tactical strobe 10 Hz
 inline void party_tactical_strobe_mode_iter(uint8_t st);
+#endif
+
+#ifdef USE_POLICE_COLOR_STROBE_MODE
+inline void police_color_strobe_iter();
 #endif
 
 #ifdef USE_LIGHTNING_MODE
@@ -88,7 +77,6 @@ inline void lightning_storm_iter();
 // bike mode config options
 #ifdef USE_BIKE_FLASHER_MODE
 #define MAX_BIKING_LEVEL 120  // should be 127 or less
-uint8_t bike_flasher_brightness = MAX_1x7135;
 inline void bike_flasher_iter();
 #endif
 
@@ -102,4 +90,3 @@ inline void bike_flasher_iter();
 #include "ff-strobe-modes.h"
 #endif
 
-#endif
