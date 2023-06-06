@@ -1,4 +1,8 @@
 // Noctigon DM11 config options for Anduril
+// Copyright (C) 2021-2023 Selene ToyKeeper
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
 #define MODEL_NUMBER "0271"
 #include "hwdef-Noctigon_DM11.h"
 #include "hank-cfg.h"
@@ -72,6 +76,3 @@
 // added for convenience
 #define USE_SOFT_FACTORY_RESET
 
-
-// work around bizarre bug: lockout mode fails when set to solid color blinking
-#define USE_K93_LOCKOUT_KLUDGE

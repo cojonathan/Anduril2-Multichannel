@@ -1,9 +1,19 @@
 // Sofirn SP10 Pro config options for Anduril
+// Copyright (C) 2022-2023 (FIXME)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
 #define MODEL_NUMBER "0631"
 #include "hwdef-Sofirn_SP10-Pro.h"
 // ATTINY: 1616
 
+// don't blink during the ramp or at the ceiling
+#ifdef BLINK_AT_RAMP_MIDDLE
 #undef BLINK_AT_RAMP_MIDDLE
+#endif
+#ifdef BLINK_AT_RAMP_CEIL
+#undef BLINK_AT_RAMP_CEIL
+#endif
 
 #define USE_DYNAMIC_UNDERCLOCKING
 

@@ -1,4 +1,8 @@
 // BLF Q8 config options for Anduril using the Attiny1616
+// Copyright (C) 2021-2023 (FIXME)
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+
 #define MODEL_NUMBER "0613"
 #include "hwdef-BLF_Q8-T1616.h"
 // ATTINY: 1616
@@ -7,9 +11,9 @@
 #define USE_INDICATOR_LED
 // the button is visible while main LEDs are on
 #define USE_INDICATOR_LED_WHILE_RAMPING
-// off mode: high (2)
+// off mode: low (1)
 // lockout: blinking (3)
-#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 2)
+#define INDICATOR_LED_DEFAULT_MODE ((3<<2) + 1)
 
 // copied from Emisar D4 ramp
 // ../../bin/level_calc.py 1 65 7135 1 0.8 150
@@ -44,6 +48,15 @@
 // Allow 3C in Simple UI for switching between smooth and stepped ramping
 #define USE_SIMPLE_UI_RAMPING_TOGGLE
 
+// allow Aux Config and Strobe Modes in Simple UI
+#define USE_EXTENDED_SIMPLE_UI
+
 // stop panicking at ~75% power or ~3000 lm, this light has high thermal mass
 #define THERM_FASTER_LEVEL (RAMP_SIZE*9/10)  // throttle back faster when high
+
+// don't blink during the ramp; the button LED brightness is sufficient
+// to indicate which power channel(s) are being used
+#ifdef BLINK_AT_RAMP_MIDDLE
+#undef BLINK_AT_RAMP_MIDDLE
+#endif
 
