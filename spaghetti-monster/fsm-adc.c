@@ -83,11 +83,6 @@ inline void adc_sleep_mode() {
         // attiny1634
         set_sleep_mode(SLEEP_MODE_ADC);
     #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
-        // set the RUNSTDBY bit so ADC will run in standby mode
-        ADC0.CTRLA |= 1;
-        // set a INITDLY value because the AVR manual says so
-        // (section 30.3.5)
-        ADC0.CTRLD |= (1 << 5);
         set_sleep_mode(SLEEP_MODE_STANDBY);
     #else
         #error No ADC sleep mode defined for this hardware.
@@ -133,10 +128,13 @@ inline void ADC_on()
         ADCSRA = (1 << ADEN) | (1 << ADSC) | (1 << ADATE) | ADC_PRSCL;
         //ADCSRA |= (1 << ADSC);  // start measuring
     #elif defined(AVRXMEGA3)  // ATTINY816, 817, etc
-        set_admux_voltage();
         VREF.CTRLA |= VREF_ADC0REFSEL_1V1_gc; // Set Vbg ref to 1.1V
-        ADC0.CTRLA = ADC_ENABLE_bm | ADC_FREERUN_bm; // Enabled, free-running (aka, auto-retrigger)
-        ADC0.COMMAND |= ADC_STCONV_bm; // Start the ADC conversions    
+        // Enabled, free-running (aka, auto-retrigger), run in standby
+        ADC0.CTRLA = ADC_ENABLE_bm | ADC_FREERUN_bm | ADC_RUNSTBY_bm;
+        // set a INITDLY value because the AVR manual says so (section 30.3.5)
+        // (delay 1st reading until Vref is stable)
+        ADC0.CTRLD |= ADC_INITDLY_DLY16_gc;
+        set_admux_voltage();
     #else
         #error Unrecognized MCU type
     #endif
@@ -144,7 +142,7 @@ inline void ADC_on()
 
 inline void ADC_off() {
     #ifdef AVRXMEGA3  // ATTINY816, 817, etc
-        ADC0.CTRLA &= ~(ADC_ENABLE_bm);  // disable the ADC 
+        ADC0.CTRLA &= ~(ADC_ENABLE_bm);  // disable the ADC
     #else
         ADCSRA &= ~(1<<ADEN); //ADC off
     #endif
@@ -325,18 +323,23 @@ static inline void ADC_voltage_handler() {
     else if (go_to_standby) {  // weaker lowpass while asleep
         // occasionally the aux LED color can oscillate during standby,
         // while using "voltage" mode ... so try to reduce the oscillation
-        uint16_t m = adc_raw[0];
-        uint16_t v = adc_smooth[0];
+        uint16_t r = adc_raw[0];
+        uint16_t s = adc_smooth[0];
         #if 0
-        // fixed-rate lowpass, slow, more stable but takes longer to settle
-        if (m < v) { v -= 64; }
-        if (m > v) { v += 64; }
+        // fixed-rate lowpass, stable but very slow
+        // (move by only 0.5 ADC units per measurement, 1 ADC unit = 64)
+        if (r < s) { s -= 32; }
+        if (r > s) { s += 32; }
+        #elif 1
+        // 1/8th proportional lowpass, faster but less stable
+        int16_t diff = (r/8) - (s/8);
+        s += diff;
         #else
-        // weighted lowpass, faster but less stable
-        v = (m>>1) + (v>>1);
+        // 50% proportional lowpass, fastest but least stable
+        s = (r>>1) + (s>>1);
         #endif
-        adc_smooth[0] = v;
-        measurement = v;
+        adc_smooth[0] = s;
+        measurement = s;
     }
     #endif
     else measurement = adc_smooth[0];
