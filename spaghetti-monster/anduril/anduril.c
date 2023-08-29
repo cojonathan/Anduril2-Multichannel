@@ -142,6 +142,10 @@
 #include "sos-mode.h"
 #endif
 
+#ifdef USE_SMOOTH_STEPS
+#include "smooth-steps.h"
+#endif
+
 // this should be last, so other headers have a chance to declare values
 #include "load-save-config.h"
 
@@ -203,6 +207,10 @@
 
 #ifdef USE_SOS_MODE
 #include "sos-mode.c"
+#endif
+
+#ifdef USE_SMOOTH_STEPS
+#include "smooth-steps.c"
 #endif
 
 
@@ -267,7 +275,7 @@ void loop() {
 
     #ifdef USE_AUX_RGB_LEDS_WHILE_ON
     // display battery charge on RGB button during use
-    if (! setting_rgb_mode_now)
+    if (state == steady_state)
         rgb_led_voltage_readout(actual_level > USE_AUX_RGB_LEDS_WHILE_ON);
     #endif
 
@@ -332,6 +340,12 @@ void loop() {
     #if defined(USE_SOS_MODE) && defined(USE_SOS_MODE_IN_BLINKY_GROUP)
     else if (state == sos_state) {
         sos_mode_iter();
+    }
+    #endif
+
+    #ifdef USE_SMOOTH_STEPS
+    else if (cfg.smooth_steps_style && smooth_steps_in_progress) {
+        smooth_steps_iter();
     }
     #endif
 

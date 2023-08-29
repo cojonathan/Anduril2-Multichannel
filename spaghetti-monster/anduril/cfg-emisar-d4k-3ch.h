@@ -13,7 +13,7 @@
 
 // turn on the aux LEDs while main LEDs are on
 // (in case there's a RGB button)
-#define USE_AUX_RGB_LEDS_WHILE_ON  20
+#define USE_AUX_RGB_LEDS_WHILE_ON  25
 #define USE_INDICATOR_LED_WHILE_RAMPING
 
 // channel modes...
@@ -85,6 +85,8 @@
 #define STROBE_BRIGHTNESS MAX_LEVEL
 // slow down party strobe; this driver can't pulse for 1ms or less
 #define PARTY_STROBE_ONTIME 2
+// bike strobe needs a longer pulse too
+#define BIKE_STROBE_ONTIME 8
 
 // the default of 26 looks a bit flat, so increase it
 #define CANDLE_AMPLITUDE 33
