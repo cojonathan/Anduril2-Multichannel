@@ -75,6 +75,8 @@
 // the default of 26 looks a bit rough, so increase it to make it smoother
 #define CANDLE_AMPLITUDE 33
 
+#define B_TIMING_ON B_TIMEOUT_T
+
 // don't blink mid-ramp
 #ifdef BLINK_AT_RAMP_MIDDLE
 #undef BLINK_AT_RAMP_MIDDLE
